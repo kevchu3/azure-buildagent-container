@@ -42,7 +42,7 @@ Optionally, replace the `--pool default` and `--agent myOCPAgent` with your own.
 5. Create the following artifacts in OpenShift.  This will build the Azure build agent image from the Dockerfile supplied in `agent.buildconfig.yaml`.
 
 ```
-$ oc new-project azure-build-agent
+$ oc new-project azure-build
 $ oc create -f resources/agent.imagestream.yaml
 $ oc create -f resources/agent.buildconfig.yaml
 ```
@@ -50,7 +50,7 @@ $ oc create -f resources/agent.buildconfig.yaml
 6. The build agent needs to run as a [privileged container].  To configure this, run the following as cluster-admin:
 
 ```
-$ oc project azure-build-agent
+$ oc project azure-build
 $ oc create sa azure-build-sa
 $ oc adm policy add-scc-to-user -z azure-build-sa privileged
 ```
