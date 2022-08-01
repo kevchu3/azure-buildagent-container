@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: azure-build-agent
-  namespace: azure-build-agent
+  namespace: azure-build
 spec:
   selector:
     matchLabels:
@@ -16,7 +16,7 @@ spec:
       containers:
         - name: azure-build-agent
           image: >-
-            image-registry.openshift-image-registry.svc:5000/azure-build-agent/azure-build-agent:latest
+            image-registry.openshift-image-registry.svc:5000/azure-build/azure-build-agent:latest
           ports:
             - containerPort: 8080
           securityContext:

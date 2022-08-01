@@ -2,7 +2,7 @@ kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
   name: azure-build-agent
-  namespace: azure-build-agent
+  namespace: azure-build
 spec:
   successfulBuildsHistoryLimit: 1
   failedBuildsHistoryLimit: 3
