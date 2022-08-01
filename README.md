@@ -16,7 +16,22 @@ $ git clone https://github.com/kevchu3/azure-buildagent-container.git
 
 2. Follow the documentation to [set up a Personal Access Token] in Azure.  Save the personal access token for use later in this installation.
 
-3. Configure the Azure build agent to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
+3. Create a new Agent Pool or configure an existing Agent Pool by navigating to Project Settings -> Agent pools.
+
+To create a new Agent Pool, navigate to Project Settings -> Agent pools, and Add agent pool.
+
+- Pool to link: New
+- Pool type: Self-hosted
+- Name: <your agent pool name>
+- Pipeline permissions: Grant access permission to all pipelines
+
+Verify from the pool's Security tab that you are assigned as an Administrator to the pool.
+
+Otherwise, configure an existing Agent Pool.  Confirm the following:
+- Pipeline permissions: Grant access permission to all pipelines
+- Verify from the pool's Security tab that you are assigned as an Administrator to the pool.
+
+4. Configure the Azure build agent to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
 Edit the inline Dockerfile instructions in BuildConfig at [agent.buildconfig.yaml].  Replace the `--url https://dev.azure.com/myOrg` and `--token myToken` variables with your own.
 Optionally, replace the `--pool default` and `--agent myOCPAgent` with your own.
 
@@ -24,7 +39,7 @@ Optionally, replace the `--pool default` and `--agent myOCPAgent` with your own.
 /opt/app-root/app/config.sh --unattended --url https://dev.azure.com/myOrg --auth pat --token myToken --pool default --agent myOCPAgent --acceptTeeEula
 ```
 
-4. Create the following artifacts in OpenShift.  This will build the Azure build agent image from the Dockerfile supplied in `agent.buildconfig.yaml`.
+5. Create the following artifacts in OpenShift.  This will build the Azure build agent image from the Dockerfile supplied in `agent.buildconfig.yaml`.
 
 ```
 $ oc new-project azure-build-agent
@@ -32,7 +47,7 @@ $ oc create -f resources/agent.imagestream.yaml
 $ oc create -f resources/agent.buildconfig.yaml
 ```
 
-5. The build agent needs to run as a [privileged container].  To configure this, run the following as cluster-admin:
+6. The build agent needs to run as a [privileged container].  To configure this, run the following as cluster-admin:
 
 ```
 $ oc project azure-build-agent
