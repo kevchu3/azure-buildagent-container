@@ -17,6 +17,22 @@ spec:
         - name: azure-build-agent
           image: >-
             image-registry.openshift-image-registry.svc:5000/azure-build/azure-build-agent:latest
+          env:
+            - name: AZP_URL
+              valueFrom:
+                secretKeyRef:
+                  name: azdevops
+                  key: AZP_URL
+            - name: AZP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: azdevops
+                  key: AZP_TOKEN
+            - name: AZP_POOL
+              valueFrom:
+                secretKeyRef:
+                  name: azdevops
+                  key: AZP_POOL
           ports:
             - containerPort: 8080
           securityContext:

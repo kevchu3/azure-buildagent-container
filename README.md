@@ -35,32 +35,68 @@ Otherwise, configure an existing Agent Pool.  Confirm the following:
 - Pipeline permissions: Grant access permission to all pipelines
 - Verify from the pool's Security tab that you are assigned as an Administrator to the pool.
 
-### 4. Configure Build Agent
+### 4. Create Build Artifacts
 
-Configure the Azure build agent to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
-Edit the inline Dockerfile instructions in BuildConfig at [agent.buildconfig.yaml].  Replace the `--url https://dev.azure.com/myOrg` and `--token myToken` variables with your own.
-Optionally, replace the `--pool default` and `--agent myOCPAgent` with your own.
-
-```
-/opt/app-root/app/config.sh --unattended --url https://dev.azure.com/myOrg --auth pat --token myToken --pool default --agent myOCPAgent --acceptTeeEula
-```
-
-Optionally, if you are using Azure Pipelines behind a web proxy, [configure the proxy] as follows.
-```
-/opt/app-root/app/config.sh --unattended --url https://dev.azure.com/myOrg --auth pat --token myToken --pool default --agent myOCPAgent --acceptTeeEula --proxyurl http://127.0.0.1:8888 --proxyusername "myuser" --proxypassword "mypass"
-```
-
-### 5. Create Build Artifacts
-
-Create the following artifacts in OpenShift.  This will build the Azure build agent image from the Dockerfile supplied in `agent.buildconfig.yaml`.
-
+Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
 ```
 $ oc new-project azure-build
+$ oc create cm start-sh --from-file=start.sh=resources/start.sh
+```
+
+Optionally, if you are using Azure Pipelines behind a web proxy, [configure the proxy] by editing the section of the `start.sh` script prior to creating the ConfigMap:
+
+```
+# in start.sh, append --proxyurl, --proxyusername, and --proxypassword arguments to ./config.sh command
+
+./config.sh --unattended \
+  --agent "${AZP_AGENT_NAME:-$HOSTNAME}" \
+  --url "$AZP_URL" \
+  --auth PAT \
+  --token $(cat "$AZP_TOKEN_FILE") \
+  --pool "${AZP_POOL:-Default}" \
+  --work "${AZP_WORK:-_work}" \
+  --proxyurl http://127.0.0.1:8888 \
+  --proxyusername "myuser" \
+  --proxypassword "mypass" \
+  --replace \
+  --acceptTeeEula & wait $!
+```
+
+Create artifacts to build the Azure build agent image:
+
+```
 $ oc create -f resources/agent.imagestream.yaml
 $ oc create -f resources/agent.buildconfig.yaml
 ```
 
-### 6. Deploy Build Agent
+### 5. Configure Build Artifacts
+
+Determine the latest published agent release.  Navigate to [Azure Pipelines Agent] and check the page for the highest version number listed.  Note the Agent download URL for Linux x64.
+
+Configure the `AZP_AGENT_PACKAGE_LATEST_URL` environment variable in the BuildConfig with the desired Agent download URL:
+
+```
+$ oc set env bc/azure-build-agent AZP_AGENT_PACKAGE_LATEST_URL=https://vstsagentpackage.azureedge.net/agent/2.206.1/vsts-agent-linux-x64-2.206.1.tar.gz
+```
+
+Build the agent image:
+
+```
+$ oc start-build azure-build-agent
+```
+
+### 6. Configure Deployment
+
+The Azure build agent is configured to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
+
+Configure the Azure DevOps credentials as a Secret, replacing the values for `AZP_URL`, `AZP_TOKEN`, and `AZP_POOL` with your own.
+
+```
+$ oc create secret generic azdevops \
+  --from-literal=AZP_URL=https://dev.azure.com/yourOrg \
+  --from-literal=AZP_TOKEN=YourPAT \
+  --from-literal=AZP_POOL=NameOfYourPool
+```
 
 The build agent needs to run as a [privileged container].  To configure this, run the following as cluster-admin:
 
@@ -71,11 +107,15 @@ $ oc adm policy add-scc-to-user -z azure-build-sa privileged -n azure-build
 
 The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
 
+### 7. Deploy Build Agent
+
 Now create the deployment which will subsequently create a running build agent pod.
 
 ```
 $ oc create -f resources/agent.deployment.yaml
 ```
+
+Optionally, you can scale up pod replicas which will deploy additional agents.
 
 ## Verifying Your Work
 
@@ -86,7 +126,7 @@ You should now see a build agent with Online status.
 GPLv3
 
 [set up a Personal Access Token]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#authenticate-with-a-personal-access-token-pat
-[unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
-[agent.buildconfig.yaml]: resources/agent.buildconfig.yaml
 [configure the proxy]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
+[Azure Pipelines Agent]: https://github.com/Microsoft/azure-pipelines-agent/releases
+[unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
 [privileged container]: https://access.redhat.com/solutions/6375251
