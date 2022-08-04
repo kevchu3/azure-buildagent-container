@@ -37,13 +37,13 @@ Otherwise, configure an existing Agent Pool.  Confirm the following:
 
 ### 4. Create Build Artifacts
 
-Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
+Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a Secret to the project:
 ```
 $ oc new-project azure-build
 $ oc create secret generic start-sh --from-file=start.sh=resources/start.sh
 ```
 
-Optionally, if you are using Azure Pipelines behind a web proxy, [configure the proxy] by editing the section of the `start.sh` script prior to creating the ConfigMap:
+Optionally, if you are using Azure Pipelines behind a web proxy, [configure the proxy] by editing the section of the `start.sh` script prior to creating the Secret:
 
 ```
 # in start.sh, append --proxyurl, --proxyusername, and --proxypassword arguments to ./config.sh command
