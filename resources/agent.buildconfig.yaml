@@ -23,8 +23,8 @@ spec:
           chmod 755 *.sh && chown -R default:root .
       USER 1001
       ENTRYPOINT ["./start.sh"]
-    configMaps:
-      - configMap:
+    secrets:
+      - secret:
           name: start-sh
   strategy:
     dockerStrategy:
