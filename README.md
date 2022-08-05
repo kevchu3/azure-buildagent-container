@@ -37,29 +37,10 @@ Otherwise, configure an existing Agent Pool.  Confirm the following:
 
 ### 4. Create Build Artifacts
 
-Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a Secret to the project:
+Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
 ```
 $ oc new-project azure-build
-$ oc create secret generic start-sh --from-file=start.sh=resources/start.sh
-```
-
-Optionally, if you are using Azure Pipelines behind a web proxy, [configure the proxy] by editing the section of the `start.sh` script prior to creating the Secret:
-
-```
-# in start.sh, append --proxyurl, --proxyusername, and --proxypassword arguments to ./config.sh command
-
-./config.sh --unattended \
-  --agent "${AZP_AGENT_NAME:-$HOSTNAME}" \
-  --url "$AZP_URL" \
-  --auth PAT \
-  --token $(cat "$AZP_TOKEN_FILE") \
-  --pool "${AZP_POOL:-Default}" \
-  --work "${AZP_WORK:-_work}" \
-  --proxyurl http://127.0.0.1:8888 \
-  --proxyusername "myuser" \
-  --proxypassword "mypass" \
-  --replace \
-  --acceptTeeEula & wait $!
+$ oc create cm start-sh --from-file=start.sh=resources/start.sh
 ```
 
 Create artifacts to build the Azure build agent image:
@@ -98,11 +79,29 @@ $ oc create secret generic azdevops \
   --from-literal=AZP_POOL=NameOfYourPool
 ```
 
-The build agent needs to run as a [privileged container].  To configure this, run the following as cluster-admin:
+If you are not using Azure Pipelines behind a web proxy, create a secret with empty proxy settings as follows:
 
 ```
-$ oc create sa azure-build-sa -n azure-build
-$ oc adm policy add-scc-to-user -z azure-build-sa privileged -n azure-build
+$ oc create secret generic azproxy \
+  --from-literal=AZP_PROXY_URL= \
+  --from-literal=AZP_PROXY_USERNAME= \
+  --from-literal=AZP_PROXY_PASSWORD=
+```
+
+For a [proxy configuration], configure and create a secret, replacing environment variables with your own.  For example:
+
+```
+$ oc create secret generic azproxy \
+  --from-literal=AZP_PROXY_URL=http://127.0.0.1:8888 \
+  --from-literal=AZP_PROXY_USERNAME=myuser \
+  --from-literal=AZP_PROXY_PASSWORD=mypass
+```
+
+The build agent needs to run as a privileged container.  To configure this, run the following as cluster-admin:
+
+```
+$ oc create sa azure-build-sa
+$ oc adm policy add-scc-to-user -z azure-build-sa privileged
 ```
 
 The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
@@ -126,7 +125,6 @@ You should now see a build agent with Online status.
 GPLv3
 
 [set up a Personal Access Token]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#authenticate-with-a-personal-access-token-pat
-[configure the proxy]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
+[proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
 [Azure Pipelines Agent]: https://github.com/Microsoft/azure-pipelines-agent/releases
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
-[privileged container]: https://access.redhat.com/solutions/6375251
