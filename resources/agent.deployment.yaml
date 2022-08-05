@@ -33,6 +33,24 @@ spec:
                 secretKeyRef:
                   name: azdevops
                   key: AZP_POOL
+            - name: AZP_PROXY_URL
+              valueFrom:
+                secretKeyRef:
+                  name: azproxy
+                  key: AZP_PROXY_URL
+                optional: true
+            - name: AZP_PROXY_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: azproxy
+                  key: AZP_PROXY_USERNAME
+                optional: true
+            - name: AZP_PROXY_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: azproxy
+                  key: AZP_PROXY_PASSWORD
+                optional: true
           ports:
             - containerPort: 8080
           securityContext:
