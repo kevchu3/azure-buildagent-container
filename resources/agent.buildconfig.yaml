@@ -16,7 +16,7 @@ spec:
 
       USER root
       COPY start.sh .
-      RUN dnf install jq -y && \
+      RUN dnf install git jq -y && \
           curl $AZP_AGENT_PACKAGE_LATEST_URL --output vsts-agent-linux-x64.tar.gz && \
           tar zxvf vsts-agent-linux-x64.tar.gz && \
           rm vsts-agent-linux-x64.tar.gz && \
