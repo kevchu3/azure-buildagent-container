@@ -51,7 +51,7 @@ source ./env.sh
 print_header "Configuring Azure Pipelines agent..."
 
 # Determine if proxy variables are set
-if [[ -z "$AZP_PROXY_URL" || -z "$AZP_PROXY_USERNAME" || -z "$AZP_PROXY_PASSWORD" ]]; then
+if [[ -z "$AZP_PROXY_URL" || -z "$AZP_PROXY_USERNAME" || -z "$AZP_PROXY_PASSWORD" || -z "$AZP_PROXY_AUTH" ]]; then
   ./config.sh --unattended \
     --agent "${AZP_AGENT_NAME:-$HOSTNAME}" \
     --url "$AZP_URL" \
@@ -63,6 +63,7 @@ if [[ -z "$AZP_PROXY_URL" || -z "$AZP_PROXY_USERNAME" || -z "$AZP_PROXY_PASSWORD
     --acceptTeeEula & wait $!
 else
   print_header "Configured to use Proxy URL: $AZP_PROXY_URL"
+  export http_proxy=$AZP_PROXY_AUTH
   ./config.sh --unattended \
     --agent "${AZP_AGENT_NAME:-$HOSTNAME}" \
     --url "$AZP_URL" \
