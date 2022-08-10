@@ -85,7 +85,8 @@ If you are not using Azure Pipelines behind a web proxy, create a secret with em
 $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL= \
   --from-literal=AZP_PROXY_USERNAME= \
-  --from-literal=AZP_PROXY_PASSWORD=
+  --from-literal=AZP_PROXY_PASSWORD= \
+  --from-literal=AZP_PROXY_AUTH=
 ```
 
 For a [proxy configuration], configure and create a secret, replacing environment variables with your own.  For example:
@@ -94,7 +95,8 @@ For a [proxy configuration], configure and create a secret, replacing environmen
 $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://127.0.0.1:8888 \
   --from-literal=AZP_PROXY_USERNAME=myuser \
-  --from-literal=AZP_PROXY_PASSWORD=mypass
+  --from-literal=AZP_PROXY_PASSWORD=mypass \
+  --from-literal=AZP_PROXY_AUTH=http://myuser:mypass@127.0.0.1:8888
 ```
 
 The build agent needs to run as a privileged container.  To configure this, run the following as cluster-admin:
