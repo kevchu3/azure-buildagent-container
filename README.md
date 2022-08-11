@@ -99,6 +99,20 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_AUTH=http://myuser:mypass@127.0.0.1:8888
 ```
 
+See the following table for a description of the above [environment variables]:
+
+| Environment variable     | Secret   | Description              |
+| ------------------------ | -------- | ------------------------ |
+| AZP_URL                  | azdevops | The URL of the Azure DevOps or Azure DevOps Server instance. |
+| AZP_TOKEN                | azdevops | Personal Access Token (PAT) with Agent Pools (read, manage) scope, created by a user who has permission to configure agents, at `AZP_URL`. |
+| AZP_POOL                 | azdevops | Agent pool name (default value: `Default`). |
+| AZP_PROXY_URL            | azproxy  | Proxy URL for Agent to talk to Azure DevOps.  Define and leave blank if not configuring proxy. |
+| AZP_PROXY_USERNAME       | azproxy  | Proxy username for Agent.  Define and leave blank if not configuring proxy. |
+| AZP_PROXY_PASSWORD       | azproxy  | Proxy password for Agent.  Define and leave blank if not configuring proxy. |
+| AZP_PROXY_ENV            | azproxy  | Configure container-wide proxy settings using `http_proxy` environment variable. |
+
+### 7. Deploy Build Agent
+
 The build agent needs to run as a privileged container.  To configure this, run the following as cluster-admin:
 
 ```
@@ -107,8 +121,6 @@ $ oc adm policy add-scc-to-user -z azure-build-sa privileged
 ```
 
 The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
-
-### 7. Deploy Build Agent
 
 Now create the deployment which will subsequently create a running build agent pod.
 
@@ -130,3 +142,4 @@ GPLv3
 [proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
 [Azure Pipelines Agent]: https://github.com/Microsoft/azure-pipelines-agent/releases
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
+[environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
