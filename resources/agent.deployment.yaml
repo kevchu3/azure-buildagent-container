@@ -51,11 +51,11 @@ spec:
                   name: azproxy
                   key: AZP_PROXY_PASSWORD
                 optional: true
-            - name: AZP_PROXY_AUTH
+            - name: AZP_PROXY_ENV
               valueFrom:
                 secretKeyRef:
                   name: azproxy
-                  key: AZP_PROXY_AUTH
+                  key: AZP_PROXY_ENV
                 optional: true
             ports:
             - containerPort: 8080
