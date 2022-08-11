@@ -86,7 +86,7 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL= \
   --from-literal=AZP_PROXY_USERNAME= \
   --from-literal=AZP_PROXY_PASSWORD= \
-  --from-literal=AZP_PROXY_AUTH=
+  --from-literal=AZP_PROXY_ENV=
 ```
 
 For a [proxy configuration], configure and create a secret, replacing environment variables with your own.  For example:
@@ -96,7 +96,7 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://127.0.0.1:8888 \
   --from-literal=AZP_PROXY_USERNAME=myuser \
   --from-literal=AZP_PROXY_PASSWORD=mypass \
-  --from-literal=AZP_PROXY_AUTH=http://myuser:mypass@127.0.0.1:8888
+  --from-literal=AZP_PROXY_ENV=http://myuser:mypass@127.0.0.1:8888
 ```
 
 See the following table for a description of the above [environment variables]:
