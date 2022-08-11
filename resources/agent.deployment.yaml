@@ -57,8 +57,8 @@ spec:
                   name: azproxy
                   key: AZP_PROXY_ENV
                 optional: true
-            ports:
-            - containerPort: 8080
+          ports:
+          - containerPort: 8080
           securityContext:
             privileged: true
       serviceAccount: azure-build-sa

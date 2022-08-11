@@ -81,7 +81,7 @@ elif [[ -z "$AZP_PROXY_USERNAME" || -z "$AZP_PROXY_PASSWORD" ]]; then
     --acceptTeeEula & wait $!
 
 else
-  print_header "Configured agent to use authenticated aroxy: $AZP_PROXY_URL"
+  print_header "Configured agent to use authenticated proxy: $AZP_PROXY_URL"
   ./config.sh --unattended \
     --agent "${AZP_AGENT_NAME:-$HOSTNAME}" \
     --url "$AZP_URL" \
