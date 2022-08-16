@@ -51,7 +51,7 @@ source ./env.sh
 print_header "Configuring Azure Pipelines agent..."
 
 # Determine if proxy variables are set
-if [ -n "$AZP_PROXY_ENV" ]; then
+if [ -z "$AZP_PROXY_ENV" ]; then
   export http_proxy=$AZP_PROXY_ENV
 fi
 
@@ -95,6 +95,8 @@ else
     --replace \
     --acceptTeeEula & wait $!
 fi
+
+unset AZP_PROXY_URL AZP_PROXY_USERNAME AZP_PROXY_PASSWORD AZP_PROXY_ENV
 
 print_header "Running Azure Pipelines agent..."
 

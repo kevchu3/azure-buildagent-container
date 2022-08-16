@@ -13,6 +13,9 @@ spec:
   source:
     dockerfile: |
       FROM registry.redhat.io/rhel8/dotnet-60-runtime:latest
+      ENV _BUILDAH_STARTED_IN_USERNS="" \
+          BUILDAH_ISOLATION=chroot \
+          STORAGE_DRIVER=vfs
 
       USER root
       COPY start.sh .
@@ -20,7 +23,13 @@ spec:
           curl $AZP_AGENT_PACKAGE_LATEST_URL --output vsts-agent-linux-x64.tar.gz && \
           tar zxvf vsts-agent-linux-x64.tar.gz && \
           rm vsts-agent-linux-x64.tar.gz && \
-          chmod 755 *.sh && chown -R default:root .
+          chmod 755 *.sh && chown -R default:root . && \
+          usermod --add-subuids 100000-165535 default && \
+          usermod --add-subgids 100000-165535 default && \
+          touch /etc/containers/nodocker && \
+          chmod u-s /usr/bin/new[gu]idmap && \
+          setcap cap_setuid+eip /usr/bin/newuidmap && \
+          setcap cap_setgid+eip /usr/bin/newgidmap
       USER 1001
       ENTRYPOINT ["./start.sh"]
     configMaps:
