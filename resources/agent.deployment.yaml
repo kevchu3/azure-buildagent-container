@@ -60,6 +60,6 @@ spec:
           ports:
           - containerPort: 8080
           securityContext:
-            privileged: true
+            runAsUser: 1001
       serviceAccount: azure-build-sa
       serviceAccountName: azure-build-sa

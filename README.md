@@ -66,7 +66,20 @@ Build the agent image:
 $ oc start-build azure-build-agent
 ```
 
-### 6. Configure Deployment
+### 6. Configure Builder as Rootless User
+
+As a security best practice, pods should be run as a rootless user.  There are several methods to accomplish this, and we have opted to lock down privileges by [creating a new SecurityContextConstraint] named `nonroot-builder` for the Azure DevOps service account for our builder pods.
+
+As cluster-admin, create a serviceaccount for the build agent, a nonroot builder SCC, and apply the SCC to the serviceaccount:
+```
+$ oc create sa azure-build-sa
+$ oc create -f resources/nonroot-builder.scc.yaml
+$ oc adm policy add-scc-to-user nonroot-builder -z azure-devops-sa
+```
+
+The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
+
+### 7. Configure Deployment
 
 The Azure build agent is configured to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
 
@@ -111,18 +124,9 @@ See the following table for a description of the above [environment variables]:
 | AZP_PROXY_PASSWORD       | azproxy  | Proxy password for Agent.  Define and leave blank if not configuring proxy. |
 | AZP_PROXY_ENV            | azproxy  | Configure container-wide proxy settings using `http_proxy` environment variable. |
 
-### 7. Deploy Build Agent
+### 8. Deploy Build Agent
 
-The build agent needs to run as a privileged container.  To configure this, run the following as cluster-admin:
-
-```
-$ oc create sa azure-build-sa
-$ oc adm policy add-scc-to-user -z azure-build-sa privileged
-```
-
-The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
-
-Now create the deployment which will subsequently create a running build agent pod.
+Create the deployment which will subsequently create a running build agent pod.
 
 ```
 $ oc create -f resources/agent.deployment.yaml
@@ -141,5 +145,6 @@ GPLv3
 [set up a Personal Access Token]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#authenticate-with-a-personal-access-token-pat
 [proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
 [Azure Pipelines Agent]: https://github.com/Microsoft/azure-pipelines-agent/releases
+[creating a new SecurityContextConstraint]: https://www.redhat.com/sysadmin/rootless-podman-jenkins-openshift
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
