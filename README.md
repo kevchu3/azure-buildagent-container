@@ -74,7 +74,7 @@ As cluster-admin, create a serviceaccount for the build agent, a nonroot builder
 ```
 $ oc create sa azure-build-sa
 $ oc create -f resources/nonroot-builder.scc.yaml
-$ oc adm policy add-scc-to-user nonroot-builder -z azure-devops-sa
+$ oc adm policy add-scc-to-user nonroot-builder -z azure-build-sa
 ```
 
 The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
