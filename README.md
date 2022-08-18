@@ -1,4 +1,4 @@
-# Installing Azure Build Agent for Linux containers
+# Hosting Azure Build Agent in OpenShift
 
 ## Prerequisites
 
@@ -43,30 +43,22 @@ $ oc new-project azure-build
 $ oc create cm start-sh --from-file=start.sh=resources/start.sh
 ```
 
-Create artifacts to build the Azure build agent image:
+Create artifacts to build the Azure build agent image.  Configured triggers will start a new build automatically.
 
 ```
-$ oc create -f resources/agent.imagestream.yaml
-$ oc create -f resources/agent.buildconfig.yaml
+$ oc create -f resources/agent.imagestream.yaml -f resources/agent.buildconfig.yaml
 ```
 
-### 5. Configure Build Artifacts
+Optionally, determine the latest published agent release.  Navigate to [Azure Pipelines Agent] and check the page for the highest version number listed.  Note the Agent download URL for Linux x64.
 
-Determine the latest published agent release.  Navigate to [Azure Pipelines Agent] and check the page for the highest version number listed.  Note the Agent download URL for Linux x64.
-
-Configure the `AZP_AGENT_PACKAGE_LATEST_URL` environment variable in the BuildConfig with the desired Agent download URL:
+Configure the `AZP_AGENT_PACKAGE_LATEST_URL` environment variable in the BuildConfig with the desired Agent download URL, and build a new agent image:
 
 ```
 $ oc set env bc/azure-build-agent AZP_AGENT_PACKAGE_LATEST_URL=https://vstsagentpackage.azureedge.net/agent/2.206.1/vsts-agent-linux-x64-2.206.1.tar.gz
-```
-
-Build the agent image:
-
-```
 $ oc start-build azure-build-agent
 ```
 
-### 6. Configure Builder as Rootless User
+### 5. Configure Builder as Rootless User
 
 As a security best practice, pods should be run as a rootless user.  There are several methods to accomplish this, and we have opted to lock down privileges by [creating a new SecurityContextConstraint] named `nonroot-builder` for the Azure DevOps service account for our builder pods.
 
@@ -79,11 +71,11 @@ $ oc adm policy add-scc-to-user nonroot-builder -z azure-build-sa
 
 The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
 
-### 7. Configure Deployment
+### 6. Configure Deployment
 
 The Azure build agent is configured to use an [unattended config], which will allow us to deploy the agent as an OpenShift pod without manual intervention.
 
-Configure the Azure DevOps credentials as a Secret, replacing the values for `AZP_URL`, `AZP_TOKEN`, and `AZP_POOL` with your own.
+Configure the Azure DevOps credentials as a Secret named azdevops, replacing the values for environment variables with your own.  For example:
 
 ```
 $ oc create secret generic azdevops \
@@ -92,24 +84,22 @@ $ oc create secret generic azdevops \
   --from-literal=AZP_POOL=NameOfYourPool
 ```
 
-If you are not using Azure Pipelines behind a web proxy, create a secret with empty proxy settings as follows:
+Optionally, for a [proxy configuration], also create a Secret named azproxy, replacing environment variables with your own.  For example:
 
 ```
 $ oc create secret generic azproxy \
-  --from-literal=AZP_PROXY_URL= \
-  --from-literal=AZP_PROXY_USERNAME= \
-  --from-literal=AZP_PROXY_PASSWORD= \
-  --from-literal=AZP_PROXY_ENV=
-```
-
-For a [proxy configuration], configure and create a secret, replacing environment variables with your own.  For example:
-
-```
-$ oc create secret generic azproxy \
-  --from-literal=AZP_PROXY_URL=http://127.0.0.1:8888 \
+  --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
   --from-literal=AZP_PROXY_USERNAME=myuser \
   --from-literal=AZP_PROXY_PASSWORD=mypass \
-  --from-literal=AZP_PROXY_ENV=http://myuser:mypass@127.0.0.1:8888
+  --from-literal=AZP_PROXY_ENV=http://myuser:mypass@192.168.0.1:8888
+```
+
+Unauthenticated proxy can be defined as follows:
+
+```
+$ oc create secret generic azproxy \
+  --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
+  --from-literal=AZP_PROXY_ENV=http://192.168.0.1:8888
 ```
 
 See the following table for a description of the above [environment variables]:
@@ -124,7 +114,7 @@ See the following table for a description of the above [environment variables]:
 | AZP_PROXY_PASSWORD       | azproxy  | Proxy password for Agent.  Define and leave blank if not configuring proxy. |
 | AZP_PROXY_ENV            | azproxy  | Configure container-wide proxy settings using `http_proxy` environment variable. |
 
-### 8. Deploy Build Agent
+### 7. Deploy Build Agent
 
 Create the deployment which will subsequently create a running build agent pod.
 

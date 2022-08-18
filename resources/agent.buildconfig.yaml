@@ -4,8 +4,6 @@ metadata:
   name: azure-build-agent
   namespace: azure-build
 spec:
-  successfulBuildsHistoryLimit: 1
-  failedBuildsHistoryLimit: 3
   output:
     to:
       kind: ImageStreamTag
@@ -27,7 +25,6 @@ spec:
           usermod --add-subuids 100000-165535 default && \
           usermod --add-subgids 100000-165535 default && \
           touch /etc/containers/nodocker && \
-          chmod u-s /usr/bin/new[gu]idmap && \
           setcap cap_setuid+eip /usr/bin/newuidmap && \
           setcap cap_setgid+eip /usr/bin/newgidmap
       USER 1001
@@ -45,4 +42,6 @@ spec:
         - name: AZP_AGENT_PACKAGE_LATEST_URL
           value: >-
             https://vstsagentpackage.azureedge.net/agent/2.206.1/vsts-agent-linux-x64-2.206.1.tar.gz
-  runPolicy: Serial
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
