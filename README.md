@@ -109,10 +109,10 @@ See the following table for a description of the above [environment variables]:
 | AZP_URL                  | azdevops | The URL of the Azure DevOps or Azure DevOps Server instance. |
 | AZP_TOKEN                | azdevops | Personal Access Token (PAT) with Agent Pools (read, manage) scope, created by a user who has permission to configure agents, at `AZP_URL`. |
 | AZP_POOL                 | azdevops | Agent pool name (default value: `Default`). |
-| AZP_PROXY_URL            | azproxy  | Proxy URL for Agent to talk to Azure DevOps.  Define and leave blank if not configuring proxy. |
-| AZP_PROXY_USERNAME       | azproxy  | Proxy username for Agent.  Define and leave blank if not configuring proxy. |
-| AZP_PROXY_PASSWORD       | azproxy  | Proxy password for Agent.  Define and leave blank if not configuring proxy. |
-| AZP_PROXY_ENV            | azproxy  | Configure container-wide proxy settings using `http_proxy` environment variable. |
+| AZP_PROXY_URL            | azproxy  | (Optional) Proxy URL for Agent to talk to Azure DevOps. |
+| AZP_PROXY_USERNAME       | azproxy  | (Optional) Proxy username for Agent. |
+| AZP_PROXY_PASSWORD       | azproxy  | (Optional) Proxy password for Agent. |
+| AZP_PROXY_ENV            | azproxy  | (Optional) Configure container-wide proxy settings using `http_proxy` environment variable. |
 
 ### 7. Deploy Build Agent
 
