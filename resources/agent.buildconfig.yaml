@@ -10,7 +10,7 @@ spec:
       name: azure-build-agent:latest
   source:
     dockerfile: |
-      FROM registry.redhat.io/rhel8/dotnet-60-runtime:latest
+      FROM registry.access.redhat.com/ubi8/dotnet-60-runtime:latest
       ENV _BUILDAH_STARTED_IN_USERNS="" \
           BUILDAH_ISOLATION=chroot \
           STORAGE_DRIVER=vfs
