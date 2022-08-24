@@ -91,7 +91,8 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
   --from-literal=AZP_PROXY_USERNAME=myuser \
   --from-literal=AZP_PROXY_PASSWORD=mypass \
-  --from-literal=AZP_PROXY_ENV=http://myuser:mypass@192.168.0.1:8888
+  --from-literal=HTTP_PROXY=http://myuser:mypass@192.168.0.1:8888 \
+  --from-literal=HTTPS_PROXY=https://myuser:mypass@192.168.0.1:8888
 ```
 
 Unauthenticated proxy can be defined as follows:
@@ -99,7 +100,8 @@ Unauthenticated proxy can be defined as follows:
 ```
 $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
-  --from-literal=AZP_PROXY_ENV=http://192.168.0.1:8888
+  --from-literal=HTTP_PROXY=http://192.168.0.1:8888 \
+  --from-literal=HTTPS_PROXY=https://192.168.0.1:8888
 ```
 
 See the following table for a description of the above [environment variables]:
@@ -112,7 +114,8 @@ See the following table for a description of the above [environment variables]:
 | AZP_PROXY_URL            | azproxy  | (Optional) Proxy URL for Agent to talk to Azure DevOps. |
 | AZP_PROXY_USERNAME       | azproxy  | (Optional) Proxy username for Agent. |
 | AZP_PROXY_PASSWORD       | azproxy  | (Optional) Proxy password for Agent. |
-| AZP_PROXY_ENV            | azproxy  | (Optional) Configure container-wide proxy settings using `http_proxy` environment variable. |
+| HTTP_PROXY               | azproxy  | (Optional) Configure container-wide proxy settings using `HTTP_PROXY` environment variable. |
+| HTTPS_PROXY              | azproxy  | (Optional) Configure container-wide proxy settings using `HTTPS_PROXY` environment variable. |
 
 ### 7. Deploy Build Agent
 
