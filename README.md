@@ -125,12 +125,22 @@ Create the deployment which will subsequently create a running build agent pod.
 $ oc create -f resources/agent.deployment.yaml
 ```
 
-Optionally, you can scale up pod replicas which will deploy additional agents.
+Optionally, if you require a privately signed CA for your proxy, you will need to perform these [additional steps]:
+
+a. [Modify the default Proxy object to include your privately signed CA certificate]
+
+b. [Inject the custom CA into your deployment].  You will deploy the [agent-with-customca.deployment.yaml] file instead of the one above:
+
+```
+$ oc create -f resources/agent-with-customca.deployment.yaml
+```
 
 ## Verifying Your Work
 
 To check that the build agent is running, from the Azure DevOps portal, navigate to Project Settings -> Agent pools -> Default (or your own Pool) -> Agents.
 You should now see a build agent with Online status.
+
+Optionally, you can scale up pod replicas which will deploy additional agents.
 
 ## License
 GPLv3
@@ -141,3 +151,7 @@ GPLv3
 [creating a new SecurityContextConstraint]: https://www.redhat.com/sysadmin/rootless-podman-jenkins-openshift
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
+[additional steps]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
+[Modify the default Proxy object to include your privately signed CA certificate]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#nw-proxy-configure-object_configuring-a-custom-pki
+[Inject the custom CA into your deployment]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
+[agent-with-customca.deployment.yaml]: resources/agent-with-customca.deployment.yaml
