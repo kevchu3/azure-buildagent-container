@@ -125,14 +125,14 @@ Create the deployment which will subsequently create a running build agent pod.
 $ oc create -f resources/agent.deployment.yaml
 ```
 
-Optionally, if you require a privately signed CA for your proxy, you will need to perform these [additional steps]:
+Optionally, you will need to perform these additional steps if you require a [privately signed CA for your proxy]:
 
-a. [Modify the default Proxy object to include your privately signed CA certificate]
+a. [Modify the default Proxy object] to include your privately signed CA certificates.
 
-b. [Inject the custom CA into your deployment].  You will deploy the [agent-with-customca.deployment.yaml] file instead of the one above:
+b. [Inject the privately signed CA] into your deployment.  You will deploy the [agent-with-custom-ca.deployment.yaml] file instead of the one above:
 
 ```
-$ oc create -f resources/agent-with-customca.deployment.yaml
+$ oc create -f resources/agent-with-custom-ca.deployment.yaml
 ```
 
 ## Verifying Your Work
@@ -151,7 +151,7 @@ GPLv3
 [creating a new SecurityContextConstraint]: https://www.redhat.com/sysadmin/rootless-podman-jenkins-openshift
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
-[additional steps]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
-[Modify the default Proxy object to include your privately signed CA certificate]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#nw-proxy-configure-object_configuring-a-custom-pki
-[Inject the custom CA into your deployment]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
-[agent-with-customca.deployment.yaml]: resources/agent-with-customca.deployment.yaml
+[privately signed CA for your proxy]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
+[Modify the default Proxy object]: https://docs.openshift.com/container-platform/4.10/security/certificates/updating-ca-bundle.html#ca-bundle-replacing_updating-ca-bundle
+[Inject the privately signed CA]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
+[agent-with-custom-ca.deployment.yaml]: resources/agent-with-custom-ca.deployment.yaml
