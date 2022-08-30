@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azure-build-agent
+spec:
+  selector:
+    matchLabels:
+      app: azure-build-agent
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        alpha.image.policy.openshift.io/resolve-names: '*'
+      labels:
+        app: azure-build-agent
+    spec:
+      containers:
+        - name: azure-build-agent
+          image: azure-build-agent:latest
+          envFrom:
+          - secretRef:
+              name: azdevops
+          - secretRef:
+              name: azproxy
+              optional: true
+          ports:
+          - containerPort: 8080
+          securityContext:
+            runAsUser: 1001
+          volumeMounts:
+          - name: trusted-ca
+            mountPath: /etc/pki/ca-trust/extracted/pem
+            readOnly: true
+      serviceAccount: azure-build-sa
+      serviceAccountName: azure-build-sa
+      volumes:
+      - name: trusted-ca
+        configMap:
+          name: ca-inject
+          items:
+            - key: ca-bundle.crt 
+              path: tls-ca-bundle.pem
