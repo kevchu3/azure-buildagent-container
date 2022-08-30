@@ -37,7 +37,7 @@ Otherwise, configure an existing Agent Pool.  Confirm the following:
 
 ### 4. Create Build Artifacts
 
-Create a new project in OpenShift.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
+Create a new project in OpenShift.  For our example, we have used `azure-build`.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
 ```
 $ oc new-project azure-build
 $ oc create cm start-sh --from-file=start.sh=resources/start.sh

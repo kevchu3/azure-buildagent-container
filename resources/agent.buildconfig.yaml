@@ -2,7 +2,6 @@ kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
   name: azure-build-agent
-  namespace: azure-build
 spec:
   output:
     to:
