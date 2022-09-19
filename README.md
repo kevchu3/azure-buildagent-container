@@ -37,16 +37,16 @@ Otherwise, configure an existing Agent Pool.  Confirm the following:
 
 ### 4. Create Build Artifacts
 
-Create a new project in OpenShift.  For our example, we have used `azure-build`.  The included `start.sh` wrapper script configures and runs the container, copy this as a ConfigMap to the project:
+Create a new project in OpenShift.  For our example, we have used `azure-build`.  The included [start.sh] wrapper script configures and runs the container, copy this as a ConfigMap to the project:
 ```
 $ oc new-project azure-build
 $ oc create cm start-sh --from-file=start.sh=resources/start.sh
 ```
 
-Create artifacts to build the Azure build agent image.  Configured triggers will start a new build automatically.
+Create [imagestream] and [buildconfig] artifacts to build the Azure build agent image.  Configured triggers will start a new build automatically.
 
 ```
-$ oc create -f resources/agent.imagestream.yaml -f resources/agent.buildconfig.yaml
+$ oc create -f resources/imagestream.yaml -f resources/buildconfig.yaml
 ```
 
 Optionally, determine the latest published agent release.  Navigate to [Azure Pipelines Agent] and check the page for the highest version number listed.  Note the Agent download URL for Linux x64.
@@ -62,14 +62,12 @@ $ oc start-build azure-build-agent
 
 As a security best practice, pods should be run as a rootless user.  There are several methods to accomplish this, and we have opted to lock down privileges by [creating a new SecurityContextConstraint] named `nonroot-builder` for the Azure DevOps service account for our builder pods.
 
-As cluster-admin, create a serviceaccount for the build agent, a nonroot builder SCC, and apply the SCC to the serviceaccount:
+As cluster-admin, create a serviceaccount for the build agent, a [nonroot-builder SCC], and apply the SCC to the serviceaccount:
 ```
 $ oc create sa azure-build-sa
-$ oc create -f resources/nonroot-builder.scc.yaml
+$ oc create -f resources/nonroot-builder.yaml
 $ oc adm policy add-scc-to-user nonroot-builder -z azure-build-sa
 ```
-
-The `agent.deployment.yaml` file has already been configured to use the `azure-build-sa` serviceaccount.
 
 ### 6. Configure Deployment
 
@@ -119,20 +117,20 @@ See the following table for a description of the above [environment variables]:
 
 ### 7. Deploy Build Agent
 
-Create the deployment which will subsequently create a running build agent pod.
+Create the [deployment] which will subsequently create a running build agent pod.
 
 ```
-$ oc create -f resources/agent.deployment.yaml
+$ oc create -f resources/deployment.yaml
 ```
 
 Optionally, you will need to perform these additional steps if you require a [privately signed CA for your proxy]:
 
 a. [Modify the default Proxy object] to include your privately signed CA certificates.
 
-b. [Inject the privately signed CA] into your deployment.  You will deploy the [agent-with-custom-ca.deployment.yaml] file instead of the one above:
+b. [Inject the privately signed CA] into your deployment.  You will deploy the [agent-with-custom-ca-deployment.yaml] file instead of the one above:
 
 ```
-$ oc create -f resources/agent-with-custom-ca.deployment.yaml
+$ oc create -f resources/agent-with-custom-ca-deployment.yaml
 ```
 
 ## Verifying Your Work
@@ -147,11 +145,16 @@ GPLv3
 
 [set up a Personal Access Token]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#authenticate-with-a-personal-access-token-pat
 [proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
+[start.sh]: resources/start.sh
+[imagestream]: resources/imagestream.yaml
+[buildconfig]: resources/buildconfig.yaml
 [Azure Pipelines Agent]: https://github.com/Microsoft/azure-pipelines-agent/releases
 [creating a new SecurityContextConstraint]: https://www.redhat.com/sysadmin/rootless-podman-jenkins-openshift
+[nonroot-builder SCC]: resources/nonroot-builder.yaml
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
 [privately signed CA for your proxy]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
+[deployment]: resources/deployment.yaml
 [Modify the default Proxy object]: https://docs.openshift.com/container-platform/4.10/security/certificates/updating-ca-bundle.html#ca-bundle-replacing_updating-ca-bundle
 [Inject the privately signed CA]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
-[agent-with-custom-ca.deployment.yaml]: resources/agent-with-custom-ca.deployment.yaml
+[agent-with-custom-ca-deployment.yaml]: resources/agent-with-custom-ca-deployment.yaml
