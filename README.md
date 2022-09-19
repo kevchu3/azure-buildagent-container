@@ -54,7 +54,7 @@ Optionally, determine the latest published agent release.  Navigate to [Azure Pi
 Configure the `AZP_AGENT_PACKAGE_LATEST_URL` environment variable in the BuildConfig with the desired Agent download URL, and build a new agent image:
 
 ```
-$ oc set env bc/azure-build-agent AZP_AGENT_PACKAGE_LATEST_URL=https://vstsagentpackage.azureedge.net/agent/2.206.1/vsts-agent-linux-x64-2.206.1.tar.gz
+$ oc set env bc/azure-build-agent AZP_AGENT_PACKAGE_LATEST_URL=https://vstsagentpackage.azureedge.net/agent/2.210.1/vsts-agent-linux-x64-2.210.1.tar.gz
 $ oc start-build azure-build-agent
 ```
 
