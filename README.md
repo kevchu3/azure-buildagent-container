@@ -155,6 +155,6 @@ GPLv3
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
 [privately signed CA for your proxy]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
 [deployment]: resources/deployment.yaml
-[Modify the default Proxy object]: https://docs.openshift.com/container-platform/4.10/security/certificates/updating-ca-bundle.html#ca-bundle-replacing_updating-ca-bundle
+[Modify the default Proxy object]: https://docs.openshift.com/container-platform/latest/security/certificates/updating-ca-bundle.html#ca-bundle-replacing_updating-ca-bundle
 [Inject the privately signed CA]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
 [agent-with-custom-ca-deployment.yaml]: resources/agent-with-custom-ca-deployment.yaml
