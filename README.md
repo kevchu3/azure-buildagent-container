@@ -90,7 +90,8 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_USERNAME=myuser \
   --from-literal=AZP_PROXY_PASSWORD=mypass \
   --from-literal=HTTP_PROXY=http://myuser:mypass@192.168.0.1:8888 \
-  --from-literal=HTTPS_PROXY=https://myuser:mypass@192.168.0.1:8888
+  --from-literal=HTTPS_PROXY=https://myuser:mypass@192.168.0.1:8888 \
+  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.<my-cluster-subdomain>,<my-cluster-subdomain>,localhost
 ```
 
 Unauthenticated proxy can be defined as follows:
@@ -99,7 +100,14 @@ Unauthenticated proxy can be defined as follows:
 $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
   --from-literal=HTTP_PROXY=http://192.168.0.1:8888 \
-  --from-literal=HTTPS_PROXY=https://192.168.0.1:8888
+  --from-literal=HTTPS_PROXY=https://192.168.0.1:8888 \
+  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.<my-cluster-subdomain>,<my-cluster-subdomain>,localhost
+```
+
+The `NO_PROXY` proxy bypass configuration can be extracted from the [cluster-wide proxy]:
+
+```
+oc get proxy -o jsonpath='{.items[0].status.no_proxy}'
 ```
 
 See the following table for a description of the above [environment variables]:
@@ -114,6 +122,7 @@ See the following table for a description of the above [environment variables]:
 | AZP_PROXY_PASSWORD       | azproxy  | (Optional) Proxy password for Agent. |
 | HTTP_PROXY               | azproxy  | (Optional) Configure container-wide proxy settings using `HTTP_PROXY` environment variable. |
 | HTTPS_PROXY              | azproxy  | (Optional) Configure container-wide proxy settings using `HTTPS_PROXY` environment variable. |
+| NO_PROXY                 | azproxy  | (Optional) Configure container-wide proxy bypass settings using `NO_PROXY` environment variable. |
 
 ### 7. Deploy Build Agent
 
@@ -144,7 +153,6 @@ Optionally, you can scale up pod replicas which will deploy additional agents.
 GPLv3
 
 [set up a Personal Access Token]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#authenticate-with-a-personal-access-token-pat
-[proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
 [start.sh]: resources/start.sh
 [imagestream]: resources/imagestream.yaml
 [buildconfig]: resources/buildconfig.yaml
@@ -152,9 +160,11 @@ GPLv3
 [creating a new SecurityContextConstraint]: https://www.redhat.com/sysadmin/rootless-podman-jenkins-openshift
 [nonroot-builder SCC]: resources/nonroot-builder.yaml
 [unattended config]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/v2-linux?view=azure-devops#unattended-config
+[proxy configuration]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/proxy?view=azure-devops&tabs=unix
+[cluster-wide proxy]: https://docs.openshift.com/container-platform/latest/networking/enable-cluster-wide-proxy.html
 [environment variables]: https://docs.microsoft.com/en-us/azure/devops/pipelines/agents/docker?view=azure-devops#environment-variables
-[privately signed CA for your proxy]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
 [deployment]: resources/deployment.yaml
+[privately signed CA for your proxy]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html
 [Modify the default Proxy object]: https://docs.openshift.com/container-platform/latest/security/certificates/updating-ca-bundle.html#ca-bundle-replacing_updating-ca-bundle
 [Inject the privately signed CA]: https://docs.openshift.com/container-platform/latest/networking/configuring-a-custom-pki.html#certificate-injection-using-operators_configuring-a-custom-pki
 [agent-with-custom-ca-deployment.yaml]: resources/agent-with-custom-ca-deployment.yaml
