@@ -17,6 +17,7 @@ spec:
       containers:
         - name: azure-build-agent
           image: azure-build-agent:latest
+          imagePullPolicy: IfNotPresent
           envFrom:
           - secretRef:
               name: azdevops
