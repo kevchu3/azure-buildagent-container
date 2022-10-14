@@ -82,16 +82,17 @@ $ oc create secret generic azdevops \
   --from-literal=AZP_POOL=NameOfYourPool
 ```
 
-Optionally, for a [proxy configuration], also create a Secret named azproxy, replacing environment variables with your own.  For example:
+Optionally, for a [proxy configuration], also create a Secret named azproxy, replacing environment variables with your own.  The `NO_PROXY` proxy bypass configuration can be extracted from the [cluster-wide proxy].  For example:
 
 ```
+$ oc get proxy -o jsonpath='{.items[0].status.noProxy}'
 $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
   --from-literal=AZP_PROXY_USERNAME=myuser \
   --from-literal=AZP_PROXY_PASSWORD=mypass \
   --from-literal=HTTP_PROXY=http://myuser:mypass@192.168.0.1:8888 \
   --from-literal=HTTPS_PROXY=https://myuser:mypass@192.168.0.1:8888 \
-  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.<my-cluster-subdomain>,<my-cluster-subdomain>,localhost
+  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.example.com,example.com,localhost
 ```
 
 Unauthenticated proxy can be defined as follows:
@@ -101,13 +102,7 @@ $ oc create secret generic azproxy \
   --from-literal=AZP_PROXY_URL=http://192.168.0.1:8888 \
   --from-literal=HTTP_PROXY=http://192.168.0.1:8888 \
   --from-literal=HTTPS_PROXY=https://192.168.0.1:8888 \
-  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.<my-cluster-subdomain>,<my-cluster-subdomain>,localhost
-```
-
-The `NO_PROXY` proxy bypass configuration can be extracted from the [cluster-wide proxy]:
-
-```
-oc get proxy -o jsonpath='{.items[0].status.no_proxy}'
+  --from-literal=NO_PROXY=.cluster.local,.ec2.internal,.svc,10.0.0.0/16,10.128.0.0/14,127.0.0.1,169.254.169.254,172.30.0.0/16,api-int.example.com,example.com,localhost
 ```
 
 See the following table for a description of the above [environment variables]:
