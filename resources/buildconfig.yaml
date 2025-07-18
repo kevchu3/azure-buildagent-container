@@ -40,7 +40,7 @@ spec:
       env:
         - name: AZP_AGENT_PACKAGE_LATEST_URL
           value: >-
-            https://vstsagentpackage.azureedge.net/agent/2.210.1/vsts-agent-linux-x64-2.210.1.tar.gz
+            https://download.agent.dev.azure.com/agent/4.258.1/vsts-agent-linux-x64-4.258.1.tar.gz
   triggers:
     - type: ConfigChange
     - type: ImageChange
